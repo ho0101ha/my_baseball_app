@@ -21,7 +21,7 @@ export default function StatsSwitcher({ logs, visit }: StatsSwitcherProps) {
   const [filter, setFilter] = useState<"all" | "5" | "10">("all");
 
   // --- 表示データの算出 ---
-  let win, lose, draw, total;
+  let win, lose, draw;
 
   if (filter === "all") {
     // 通算の場合は、DBの集計テーブル（visit）を優先する
@@ -37,7 +37,7 @@ export default function StatsSwitcher({ logs, visit }: StatsSwitcherProps) {
     draw = sliced.filter((log) => log.result === GameResult.DRAW).length;
   }
 
-  total = win + lose + draw;
+   const total = win + lose + draw;
   const winRate = total - draw > 0 ? ((win / (total - draw)) * 100).toFixed(1) : "0.0";
 
   const buttons = [

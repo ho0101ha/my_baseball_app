@@ -3,13 +3,24 @@
 import { updateGameAction } from "@/actions/actions";
 import { GameResult } from "@/lib/constants";
 import { useActionState, useRef } from "react";
+type Props = {
+  
+    date: Date;
+    comment: string | null;
+    food: string | null;
+    result: string;
+    id: string;
+    userId: string;
+    stadiumId: string;
+    opponent: string | null;
 
+}
 const results = [
 { val: GameResult.WIN, label: '勝', color: 'peer-checked:bg-blue-600 peer-checked:text-white' },
 { val: GameResult.LOSS, label: '負', color: 'peer-checked:bg-red-500 peer-checked:text-white' },
 { val: GameResult.DRAW, label: '分', color: 'peer-checked:bg-slate-500 peer-checked:text-white' },
 ];
-export default function EditLogModal({log}:{log:any}) {
+export default function EditLogModal({log}:{log:Props}) {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const [state,originalAction,isPending] = useActionState(updateGameAction,null);
 

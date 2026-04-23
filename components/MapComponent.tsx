@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -19,14 +19,8 @@ interface VisitData {
 
 export default function MapComponent({ userVisits }: { userVisits: VisitData[] }) {
   const [selectedStadiumId, setSelectedStadiumId] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
 
-  // クライアントサイドでのみレンダリングを許可するフラグ
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // アイコン定義をブラウザ実行時のみに限定
+  // アイコン定義（ブラウザ環境のみで初期化）
   const icons = useMemo(() => {
     if (typeof window === 'undefined') return null;
 
@@ -46,11 +40,12 @@ export default function MapComponent({ userVisits }: { userVisits: VisitData[] }
     };
   }, []);
 
-  if (!isClient || !icons) return null;
+  // サーバーサイド（またはアイコン未生成時）はスケルトンを表示
+  if (!icons) return <div className="h-full w-full bg-slate-100 animate-pulse" />;
 
   return (
     <div className="h-full w-full flex flex-col relative">
-      <div className="flex-1 relative min-h-[500px]">
+      <div className="flex-1 relative min-h-125">
         <MapContainer 
           center={[36.5, 137.5]} 
           zoom={7} 
@@ -80,19 +75,19 @@ export default function MapComponent({ userVisits }: { userVisits: VisitData[] }
       </div>
 
       {selectedStadiumId && (
-        <div className="absolute  bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-2xl z-[1001]">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-2xl z-1001">
           <div className="bg-white rounded-xl shadow-2xl p-2 relative border border-slate-200">
              <button 
               onClick={() => setSelectedStadiumId(null)}
               className="absolute -top-3 -right-3 w-10 h-10 bg-slate-900 text-white rounded-full z-10 font-bold shadow-xl flex items-center justify-center"
             >
-              ×
+              x
             </button>
             <LogForm 
-        key={selectedStadiumId} 
-        stadium={NPB_STADIUMS.find(s => s.id === selectedStadiumId)!}
-        current={userVisits.find(v => v.stadiumId === selectedStadiumId)}
-      />
+              key={selectedStadiumId} 
+              stadium={NPB_STADIUMS.find(s => s.id === selectedStadiumId)!}
+              current={userVisits.find(v => v.stadiumId === selectedStadiumId)}
+            />
           </div>
         </div>
       )}

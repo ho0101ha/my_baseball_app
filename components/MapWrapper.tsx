@@ -2,6 +2,17 @@
 
 import dynamic from 'next/dynamic';
 
+// VisitDataの型を定義（または共通ファイルからimport）
+interface VisitData {
+  id: string;
+  stadiumId: string;
+  wins: number;
+  losses: number;
+  draws: number;
+  userId: string;
+  visitedAt: Date;
+}
+
 // MapComponentをSSR: falseで読み込む
 const MapComponent = dynamic(() => import('./MapComponent'), { 
   ssr: false,
@@ -12,8 +23,7 @@ const MapComponent = dynamic(() => import('./MapComponent'), {
   )
 });
 
-// Wrapper自体はSSR時に「何も読み込まない」という動作を徹底させる
-export default function MapWrapper({ userVisits }: { userVisits: any[] }) {
+export default function MapWrapper({ userVisits }: { userVisits: VisitData[] }) {
   return (
     <div className="h-full w-full relative">
       <MapComponent userVisits={userVisits} />
