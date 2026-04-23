@@ -163,9 +163,12 @@ export default async function HomePage() {
             </h2>
             <OpponentSelector stats={opponentStats}/>
           </section>
-         <section>
-          <QuickAddForm/>
-         </section>
+          {isLogin && (
+            <section>
+            <QuickAddForm/>
+           </section>
+          )}
+        
           {isLogin && (
             <section className="bg-white p-8 rounded-none border-l-4 border-slate-900 shadow-lg relative overflow-hidden ">
               <div className="absolute top-0 right-0 w-24 h-24 bg-slate-100 transform rotate-45 translate-x-12 -translate-y-12 transition-transform "></div>
