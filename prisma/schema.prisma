@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// datasource db {
+//   provider = "sqlite"
+//   url      = "file:./dev.db"
+// }
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl = env("DATABASE_URL_NON_POOLING")
+}
+
+// ユーザー情報
+model User {
+  id           String    @id @default(cuid())
+  name         String?
+  email        String    @unique
+  password     String // 追加：ハッシュ化したパスワードを保存するため
+  image        String?
+  favoriteTeam String? // 推し球団のID ('tigers', 'giants'等)
+  visits       Visit[] // リレーション
+  gameLogs     GameLog[]
+  isAdmin      Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt // 追加：データの更新日時を自動記録
+}
+
+// 観戦成績・訪問記録
+model Visit {
+  id        String @id @default(cuid())
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stadiumId String // 'fighters', 'tigers' などのID
+
+  // --- 試合結果を数値(Int / number)で保持 ---
+  wins   Int @default(0) // 勝利数
+  losses Int @default(0) // 敗戦数
+  draws  Int @default(0) // 引き分け数
+
+  visitedAt DateTime @default(now())
+
+  // 同じユーザーが同じ球場を1回しか登録できない（1つの球場につき1レコードに集計）
+  @@unique([userId, stadiumId])
+}
+
+
+model GameLog {
+  id        String   @id @default(cuid())
+  date      DateTime @default(now())
+  result    String // "勝", "負", "分"
+  stadiumId String
+  opponent String?
+  food  String?
+  comment String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId,stadiumId])
+  @@index([opponent])
+}
